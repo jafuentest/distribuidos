@@ -22,7 +22,7 @@ namespace streamServer
         Socket sListen;
         Thread hilo;
         /// <summary>
-        /// constructor de la clase
+        /// Constructor de la clase
         /// </summary>
         public Form1()
         {
@@ -31,9 +31,10 @@ namespace streamServer
            // _puerto = Convert.ToInt32(this.puerto.Text);
         }
         #endregion
+
         #region controlador visual
         /// <summary>
-        /// controlador del listview
+        /// Controlador del listview
         /// </summary>
         public void Mensaje()
         {
@@ -43,9 +44,10 @@ namespace streamServer
                 this.procesos.Items.Add(mensaje);
         }
         #endregion
+
         #region seccion de control del servicio TCP/IP
         /// <summary>
-        /// registra la red en la que esta conectado el servidor
+        /// Registra la red en la que esta conectado el servidor
         /// </summary>
         /// <returns>string con la direccion de Red</returns>
         public string getIp()
@@ -62,24 +64,29 @@ namespace streamServer
             }
             return localIP;
         }
+
         /// <summary>
-        /// metodo que manipula el servicio de escucha
+        /// Metodo que manipula el servicio de escucha
         /// </summary>
         public void demonio()
         {
             string localIP =  this.getIp();            
-            // 1. creando el socket del servicio
+            // 1. Creando el socket del servicio
             sListen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            // 2. rellenando los datos de red
+
+            // 2. Rellenando los datos de red
             IPAddress IP = IPAddress.Parse(localIP);
             IPEndPoint IPE = new IPEndPoint(IP, Int32.Parse( this.numeroPuerto.Text ));
-            // 3. creando el servicio
+
+            // 3. Creando el servicio
             sListen.Bind(IPE);
-            // 4. inicio del monitoreo de peticiones
+
+            // 4. Inicio del monitoreo de peticiones
             mensaje = "Escuchando peticiones ... en la Red " + localIP;
             this.Mensaje();
             sListen.Listen(2);
-            // 5. mantenimiento del servicio en escucha
+
+            // 5. Mantenimiento del servicio en escucha
             while (true)
             {
                 Socket clientSocket;
@@ -93,18 +100,19 @@ namespace streamServer
                 {
                     throw;
                 }
-                // envia la imagen
+                // Envia la imagen
                 byte[] buffer2 = new byte[1000000];
                 clientSocket.Receive(buffer2, buffer2.Length, SocketFlags.None);
                 var msg = Encoding.Unicode.GetString(buffer2);
                 byte[] buffer = ReadImageFile("img\\" + msg[0] + ".jpg");
-                    mensaje = "Enviando imagen " + msg + " a cliente";
-                    this.Mensaje();
-                    clientSocket.Send(buffer, buffer.Length, SocketFlags.None);
+                mensaje = "Enviando imagen " + msg + " a cliente";
+                this.Mensaje();
+                clientSocket.Send(buffer, buffer.Length, SocketFlags.None);
             }
         }
+
         /// <summary>
-        /// transforma la imagen en un arreglo de bytes
+        /// Transforma la imagen en un arreglo de bytes
         /// </summary>
         /// <param name="img">path de la imagen</param>
         /// <returns>imagen serializada en bytes</returns>
@@ -119,8 +127,9 @@ namespace streamServer
             GC.ReRegisterForFinalize(fs);
             return buf;
         }
+
         /// <summary>
-        /// evento para el inicio del servicio
+        /// Evento para el inicio del servicio
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

@@ -19,7 +19,7 @@ namespace streamClient
     {
         #region encabezado de la clase
         /// <summary>
-        /// atributos de la ventana
+        /// Atributos de la ventana
         /// </summary>
         private string mensaje;
         private Socket s;
@@ -29,8 +29,9 @@ namespace streamClient
         private Thread clienteH;
         private bool lleno;
         private List<string> mili = new List<string>();
+
         /// <summary>
-        /// constructor de la ventana
+        /// Constructor de la ventana
         /// </summary>
         public Form1()
         {
@@ -43,9 +44,10 @@ namespace streamClient
             this.lleno = false;
         }
         #endregion
+
         #region manejo de componentes visuales
         /// <summary>
-        /// controla el listview para simular el buffer
+        /// Controla el listview para simular el buffer
         /// </summary>
         public void Mensaje()
         {
@@ -54,8 +56,9 @@ namespace streamClient
             else
                 this.buffer.Items.Add(mensaje);
         }
+
         /// <summary>
-        /// controla el pictureBox para la simulacion de "reproduccion de video"
+        /// Controla el pictureBox para la simulacion de "reproduccion de video"
         /// </summary>
         public void Pintar()
         {
@@ -70,9 +73,10 @@ namespace streamClient
                 }
         }
         #endregion
+
         #region servicios de socket
         /// <summary>
-        /// toma el ip de la red en la que se encuentra conectada la maquina
+        /// Toma el ip de la red en la que se encuentra conectada la maquina
         /// </summary>
         /// <returns>retorna la direccion de red</returns>
         private string getIp()
@@ -89,25 +93,29 @@ namespace streamClient
             }
             return localIP;
         }
+
         /// <summary>
-        /// genera la coneccion con el servidor via TCP/IP
+        /// Genera la coneccion con el servidor via TCP/IP
         /// </summary>
         private void cliente()
         {
             while (i < 10)
             {
-                // 1. crea el socket
+                // 1. Crea el socket
                 s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                // 2. llena los parametros de red
+
+                // 2. Llena los parametros de red
                 IPAddress IP = IPAddress.Parse(this.TB_red.Text);
                 IPEndPoint IPE = new IPEndPoint(IP, Int32.Parse(this.numeroPuerto.Text));
                 mensaje = "Recibiendo servicios en la Red " + this.TB_red.Text;
                 this.Mensaje();
-                // 3. conecta con el servidor
+
+                // 3. Conecta con el servidor
                 s.Connect(IPE);
                 byte[] secuencia = Encoding.UTF8.GetBytes(i.ToString());
                 s.Send(secuencia, secuencia.Length, SocketFlags.None);
-                // 4. recibe y transforma los datos
+
+                // 4. Recibe y transforma los datos
                 byte[] buffer = new byte[1000000];
                 s.Receive(buffer, buffer.Length, SocketFlags.None);
                 var msg = Encoding.Unicode.GetString(buffer);
@@ -125,8 +133,9 @@ namespace streamClient
             this.lleno = true;
             this.continuar();
         }
+
         /// <summary>
-        /// en caso de que el buffer este lleno este metodo continua con la reproduccion del video en pantalla
+        /// En caso de que el buffer este lleno este metodo continua con la reproduccion del video en pantalla
         /// </summary>
         private void continuar()
         { 
@@ -136,8 +145,9 @@ namespace streamClient
                 Pintar();
             }
         }
+
         /// <summary>
-        /// evento del boton inicio, da comienzo a la interaccion cliente servidor
+        /// Evento del boton inicio, da comienzo a la interaccion cliente servidor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -180,16 +190,19 @@ namespace streamClient
         {
             this.velocidades(2);
         }
+
         private void rapido_Click(object sender, EventArgs e)
         {
             this.velocidades(3);
         }
+
         private void lento_Click(object sender, EventArgs e)
         {
             this.velocidades(1);
         }
+
         /// <summary>
-        /// este metodo controla la velocidad de reproduccion
+        /// Este metodo controla la velocidad de reproduccion
         /// </summary>
         /// <param name="parametro">tipo de velocidadn 1: lento 2: normal 3: rapido</param>
         private void velocidades(int parametro)
@@ -203,7 +216,7 @@ namespace streamClient
                     this.delay = 3000;
                     mensaje = "Velocidad de reproduccion 3 segundos";
                     this.Mensaje();
-                break;
+                    break;
                 case 2:
                     this.lento.Enabled = true;
                     this.rapido.Enabled = true;
@@ -211,7 +224,7 @@ namespace streamClient
                     this.delay = 1000;
                     mensaje = "Velocidad de reproduccion 1 segundo";
                     this.Mensaje();
-                break;
+                    break;
                 case 3:
                     this.lento.Enabled = true;
                     this.normal.Enabled = true;
@@ -219,7 +232,7 @@ namespace streamClient
                     this.delay = 500;
                     mensaje = "Velocidad de reproduccion 0.5 segundos";
                     this.Mensaje();
-                break;
+                    break;
             }
         }
         #endregion
