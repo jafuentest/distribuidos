@@ -1,6 +1,6 @@
 ﻿namespace streamClient
 {
-    partial class Form1
+    partial class Ventana
     {
         /// <summary>
         /// Required designer variable.
@@ -124,7 +124,6 @@
             this.buffer.Name = "buffer";
             this.buffer.Size = new System.Drawing.Size(205, 212);
             this.buffer.TabIndex = 8;
-            this.buffer.SelectedIndexChanged += new System.EventHandler(this.buffer_SelectedIndexChanged);
             // 
             // TB_red
             // 

@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace streamClient
 {
-    public partial class Form1 : Form
+    public partial class Ventana : Form
     {
         #region encabezado de la clase
         /// <summary>
@@ -33,7 +33,7 @@ namespace streamClient
         /// <summary>
         /// Constructor de la ventana
         /// </summary>
-        public Form1()
+        public Ventana()
         {
             InitializeComponent();
             this.lento.Enabled = true;
@@ -62,15 +62,15 @@ namespace streamClient
         /// </summary>
         public void Pintar()
         {
-                if (this.InvokeRequired)
-                    this.Invoke(new MethodInvoker(Pintar));
-                else
-                {
-                        this.pantalla.Image = Image.FromFile(this.mili[this.dibujo] + this.dibujo.ToString() + ".jpg");
-                        this.dibujo++;
-                        if (this.dibujo == 10)
-                            this.dibujo = 0;
-                }
+            if (this.InvokeRequired)
+                this.Invoke(new MethodInvoker(Pintar));
+            else
+            {
+                this.pantalla.Image = Image.FromFile(this.mili[this.dibujo] + this.dibujo.ToString() + ".jpg");
+                this.dibujo++;
+                if (this.dibujo == 10)
+                    this.dibujo = 0;
+            }
         }
         #endregion
 
@@ -210,23 +210,23 @@ namespace streamClient
             switch (parametro)
             {
                 case 1:
+                    this.lento.Enabled  = false;
                     this.normal.Enabled = true;
                     this.rapido.Enabled = true;
-                    this.lento.Enabled = false;
                     this.delay = 3000;
                     mensaje = "Velocidad de reproduccion 3 segundos";
                     this.Mensaje();
                     break;
                 case 2:
-                    this.lento.Enabled = true;
-                    this.rapido.Enabled = true;
+                    this.lento.Enabled  = true;
                     this.normal.Enabled = false;
+                    this.rapido.Enabled = true;
                     this.delay = 1000;
                     mensaje = "Velocidad de reproduccion 1 segundo";
                     this.Mensaje();
                     break;
                 case 3:
-                    this.lento.Enabled = true;
+                    this.lento.Enabled  = true;
                     this.normal.Enabled = true;
                     this.rapido.Enabled = false;
                     this.delay = 500;
@@ -236,10 +236,5 @@ namespace streamClient
             }
         }
         #endregion
-
-        private void buffer_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

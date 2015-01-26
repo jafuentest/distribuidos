@@ -14,7 +14,7 @@ namespace streamServer
         [STAThread]
         static void Main()
         {
-            using (Form1 ventana = new Form1())
+            using (Ventana ventana = new Ventana())
             {
                 ventana.ShowDialog();
             }

@@ -3,36 +3,34 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Sockets;
 using System.Net;
-using System.IO;
+using System.Net.Sockets;
 
 namespace streamServer
 {
-    public partial class Form1 : Form
+    public partial class Ventana : Form
     {
-        #region encabezado de la clase
-        string mensaje;
-        int _puerto;
+        #region Encabezado
+        private string mensaje;
         Socket sListen;
-        Thread hilo;
+        Thread hiloTCP;
+        Thread hiloUDP;
         /// <summary>
         /// Constructor de la clase
         /// </summary>
-        public Form1()
+        public Ventana()
         {
             InitializeComponent();
-           // servidor = new Servidor(this.procesos);
-           // _puerto = Convert.ToInt32(this.puerto.Text);
         }
         #endregion
 
-        #region controlador visual
+        #region Controlador visual
         /// <summary>
         /// Controlador del listview
         /// </summary>
@@ -45,7 +43,73 @@ namespace streamServer
         }
         #endregion
 
-        #region seccion de control del servicio TCP/IP
+        #region Servicio de audio (UDP)
+        /// <summary>
+        /// Envía las pistas de sonido para cada imágen
+        /// </summary>
+        public void enviarAudio(String id)
+        {
+            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            IPAddress broadcast = IPAddress.Parse("192.168.1.255");
+
+            byte[] enviado = Encoding.ASCII.GetBytes("Some text"); //ReadFile("audio\\" + nombre[0] + ".jpg");
+            mensaje = "Enviando audio al cliente";
+            this.Mensaje();
+
+            IPEndPoint ep = new IPEndPoint(broadcast, Int32.Parse(this.puertoUDP.Text));
+            s.SendTo(enviado, ep);
+        }
+        #endregion
+
+        #region Servicio de imágenes (TCP/IP)
+        /// <summary>
+        /// Metodo que manipula el servicio de escucha
+        /// </summary>
+        public void demonio()
+        {
+            string localIP = this.getIp();
+            // 1. Creando el socket del servicio
+            sListen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            // 2. Rellenando los datos de red
+            IPAddress IP = IPAddress.Parse(localIP);
+            IPEndPoint IPE = new IPEndPoint(IP, Int32.Parse(this.puertoTCP.Text));
+
+            // 3. Creando el servicio
+            sListen.Bind(IPE);
+
+            // 4. Inicio del monitoreo de peticiones
+            mensaje = "Escuchando peticiones en la Red " + localIP;
+            this.Mensaje();
+            sListen.Listen(2);
+
+            // 5. Mantenimiento del servicio en escucha
+            while (true)
+            {
+                Socket clientSocket;
+                try
+                {
+                    clientSocket = sListen.Accept();
+                    mensaje = "Aceptada solicitud del cliente";
+                    this.Mensaje();
+                }
+                catch
+                {
+                    throw;
+                }
+
+                // Envia la imagen
+                byte[] recibido = new byte[1000000];
+                clientSocket.Receive(recibido, recibido.Length, SocketFlags.None);
+                var msg = Encoding.Unicode.GetString(recibido);
+
+                byte[] enviado = ReadFile("img\\" + msg[0] + ".jpg");
+                mensaje = "Enviando imagen " + msg + " al cliente";
+                this.Mensaje();
+                clientSocket.Send(enviado, enviado.Length, SocketFlags.None);
+            }
+        }
+
         /// <summary>
         /// Registra la red en la que esta conectado el servidor
         /// </summary>
@@ -66,68 +130,24 @@ namespace streamServer
         }
 
         /// <summary>
-        /// Metodo que manipula el servicio de escucha
-        /// </summary>
-        public void demonio()
-        {
-            string localIP =  this.getIp();            
-            // 1. Creando el socket del servicio
-            sListen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-            // 2. Rellenando los datos de red
-            IPAddress IP = IPAddress.Parse(localIP);
-            IPEndPoint IPE = new IPEndPoint(IP, Int32.Parse( this.numeroPuerto.Text ));
-
-            // 3. Creando el servicio
-            sListen.Bind(IPE);
-
-            // 4. Inicio del monitoreo de peticiones
-            mensaje = "Escuchando peticiones ... en la Red " + localIP;
-            this.Mensaje();
-            sListen.Listen(2);
-
-            // 5. Mantenimiento del servicio en escucha
-            while (true)
-            {
-                Socket clientSocket;
-                try
-                {
-                    clientSocket = sListen.Accept();
-                    mensaje = "Aceptada solicitud de cliente";
-                    this.Mensaje();
-                }
-                catch
-                {
-                    throw;
-                }
-                // Envia la imagen
-                byte[] buffer2 = new byte[1000000];
-                clientSocket.Receive(buffer2, buffer2.Length, SocketFlags.None);
-                var msg = Encoding.Unicode.GetString(buffer2);
-                byte[] buffer = ReadImageFile("img\\" + msg[0] + ".jpg");
-                mensaje = "Enviando imagen " + msg + " a cliente";
-                this.Mensaje();
-                clientSocket.Send(buffer, buffer.Length, SocketFlags.None);
-            }
-        }
-
-        /// <summary>
         /// Transforma la imagen en un arreglo de bytes
         /// </summary>
-        /// <param name="img">path de la imagen</param>
+        /// <param name="fileName">path de la imagen</param>
         /// <returns>imagen serializada en bytes</returns>
-        private static byte[] ReadImageFile(String img)
+        private static byte[] ReadFile(String fileName)
         {
-            FileInfo fileinfo = new FileInfo(img);
+            FileInfo fileinfo = new FileInfo(fileName);
             byte[] buf = new byte[fileinfo.Length];
-            FileStream fs = new FileStream(img, FileMode.Open, FileAccess.Read);
+            FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             fs.Read(buf, 0, buf.Length);
             fs.Close();
             GC.ReRegisterForFinalize(fileinfo);
             GC.ReRegisterForFinalize(fs);
             return buf;
         }
+        #endregion
 
+        #region Eventos de la ventana
         /// <summary>
         /// Evento para el inicio del servicio
         /// </summary>
@@ -137,22 +157,22 @@ namespace streamServer
         {
             if (this.inicio.Text.Equals("Iniciar"))
             {
-                if (Int32.Parse(this.numeroPuerto.Text) >= 50000)
+                if (Int32.Parse(this.puertoTCP.Text) >= 50000)
                 {
-                    this.numeroPuerto.Enabled = false;
+                    this.puertoTCP.Enabled = false;
                     this.inicio.Text = "Detener";
                     this.procesos.Items.Add("Iniciando...");
-                    hilo = new Thread(this.demonio);
-                    hilo.Start();
+                    hiloTCP = new Thread(this.demonio);
+                    hiloTCP.Start();
                 }
                 else
                     System.Windows.Forms.MessageBox.Show("El puerto debe de no menor a 50000");
             }
             else
             {
-                this.numeroPuerto.Enabled = true;
+                this.puertoTCP.Enabled = true;
                 this.inicio.Text = "Iniciar";
-                hilo.Suspend();
+                hiloTCP.Suspend();
                 sListen.Close();
             }
         }
