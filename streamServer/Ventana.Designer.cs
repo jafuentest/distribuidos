@@ -69,7 +69,7 @@
             this.puertoTCP.Name = "puertoTCP";
             this.puertoTCP.Size = new System.Drawing.Size(38, 20);
             this.puertoTCP.TabIndex = 3;
-            this.puertoTCP.Text = "50000";
+            this.puertoTCP.Text = "5000";
             // 
             // puertoUDP
             // 
@@ -77,7 +77,7 @@
             this.puertoUDP.Name = "puertoUDP";
             this.puertoUDP.Size = new System.Drawing.Size(38, 20);
             this.puertoUDP.TabIndex = 5;
-            this.puertoUDP.Text = "50001";
+            this.puertoUDP.Text = "5001";
             // 
             // lab_puertoUDP
             // 
@@ -105,7 +105,6 @@
             this.PerformLayout();
 
         }
-
         #endregion
 
         private System.Windows.Forms.Button inicio;

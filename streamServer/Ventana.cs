@@ -5,12 +5,12 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net;
-using System.Net.Sockets;
 
 namespace streamServer
 {
@@ -18,9 +18,8 @@ namespace streamServer
     {
         #region Encabezado
         private string mensaje;
-        Socket sListen;
+        Socket serverSocket;
         Thread hiloTCP;
-        Thread hiloUDP;
         /// <summary>
         /// Constructor de la clase
         /// </summary>
@@ -45,19 +44,18 @@ namespace streamServer
 
         #region Servicio de audio (UDP)
         /// <summary>
-        /// Envía las pistas de sonido para cada imágen
+        /// Envía las pistas de sonido para cada imagen
         /// </summary>
-        public void enviarAudio(String id)
+        public void enviarAudio(char id, IPAddress ip)
         {
-            Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            IPAddress broadcast = IPAddress.Parse("192.168.1.255");
-
-            byte[] enviado = Encoding.ASCII.GetBytes("Some text"); //ReadFile("audio\\" + nombre[0] + ".jpg");
+            Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            byte[] audio = ReadFile("audio\\" + id + ".mp3");
+            IPEndPoint ep = new IPEndPoint(ip, Int32.Parse(this.puertoUDP.Text));
             mensaje = "Enviando audio al cliente";
             this.Mensaje();
 
-            IPEndPoint ep = new IPEndPoint(broadcast, Int32.Parse(this.puertoUDP.Text));
-            s.SendTo(enviado, ep);
+            socket.SendTo(audio, ep);
+            //socket.Close();
         }
         #endregion
 
@@ -69,19 +67,19 @@ namespace streamServer
         {
             string localIP = this.getIp();
             // 1. Creando el socket del servicio
-            sListen = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             // 2. Rellenando los datos de red
-            IPAddress IP = IPAddress.Parse(localIP);
+            IPAddress IP = IPAddress.Any;//Parse(localIP);
             IPEndPoint IPE = new IPEndPoint(IP, Int32.Parse(this.puertoTCP.Text));
 
             // 3. Creando el servicio
-            sListen.Bind(IPE);
+            serverSocket.Bind(IPE);
 
             // 4. Inicio del monitoreo de peticiones
-            mensaje = "Escuchando peticiones en la Red " + localIP;
+            mensaje = "Escuchando peticiones en la Red " + IP.ToString();
             this.Mensaje();
-            sListen.Listen(2);
+            serverSocket.Listen(2);
 
             // 5. Mantenimiento del servicio en escucha
             while (true)
@@ -89,7 +87,7 @@ namespace streamServer
                 Socket clientSocket;
                 try
                 {
-                    clientSocket = sListen.Accept();
+                    clientSocket = serverSocket.Accept();
                     mensaje = "Aceptada solicitud del cliente";
                     this.Mensaje();
                 }
@@ -107,6 +105,7 @@ namespace streamServer
                 mensaje = "Enviando imagen " + msg + " al cliente";
                 this.Mensaje();
                 clientSocket.Send(enviado, enviado.Length, SocketFlags.None);
+                enviarAudio(msg[0], IPAddress.Parse(((IPEndPoint) clientSocket.RemoteEndPoint).Address.ToString()));
             }
         }
 
@@ -157,23 +156,25 @@ namespace streamServer
         {
             if (this.inicio.Text.Equals("Iniciar"))
             {
-                if (Int32.Parse(this.puertoTCP.Text) >= 50000)
+                if (Int32.Parse(this.puertoTCP.Text) >= 5000)
                 {
                     this.puertoTCP.Enabled = false;
+                    this.puertoUDP.Enabled = false;
                     this.inicio.Text = "Detener";
                     this.procesos.Items.Add("Iniciando...");
                     hiloTCP = new Thread(this.demonio);
                     hiloTCP.Start();
                 }
                 else
-                    System.Windows.Forms.MessageBox.Show("El puerto debe de no menor a 50000");
+                    System.Windows.Forms.MessageBox.Show("El puerto no debe ser menor a 5000");
             }
             else
             {
                 this.puertoTCP.Enabled = true;
+                this.puertoUDP.Enabled = true;
                 this.inicio.Text = "Iniciar";
                 hiloTCP.Suspend();
-                sListen.Close();
+                serverSocket.Close();
             }
         }
         #endregion

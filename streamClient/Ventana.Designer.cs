@@ -34,11 +34,12 @@
             this.rapido = new System.Windows.Forms.Button();
             this.velocidad = new System.Windows.Forms.Label();
             this.puerto = new System.Windows.Forms.Label();
-            this.numeroPuerto = new System.Windows.Forms.TextBox();
+            this.puertoTCP = new System.Windows.Forms.TextBox();
             this.pantalla = new System.Windows.Forms.PictureBox();
             this.buffer = new System.Windows.Forms.ListBox();
             this.TB_red = new System.Windows.Forms.TextBox();
             this.red = new System.Windows.Forms.Label();
+            this.puertoUDP = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pantalla)).BeginInit();
             this.SuspendLayout();
             // 
@@ -96,17 +97,17 @@
             this.puerto.AutoSize = true;
             this.puerto.Location = new System.Drawing.Point(16, 181);
             this.puerto.Name = "puerto";
-            this.puerto.Size = new System.Drawing.Size(38, 13);
+            this.puerto.Size = new System.Drawing.Size(43, 13);
             this.puerto.TabIndex = 5;
-            this.puerto.Text = "Puerto";
+            this.puerto.Text = "Puertos";
             // 
-            // numeroPuerto
+            // puertoTCP
             // 
-            this.numeroPuerto.Location = new System.Drawing.Point(13, 197);
-            this.numeroPuerto.Name = "numeroPuerto";
-            this.numeroPuerto.Size = new System.Drawing.Size(100, 20);
-            this.numeroPuerto.TabIndex = 6;
-            this.numeroPuerto.Text = "50000";
+            this.puertoTCP.Location = new System.Drawing.Point(13, 197);
+            this.puertoTCP.Name = "puertoTCP";
+            this.puertoTCP.Size = new System.Drawing.Size(100, 20);
+            this.puertoTCP.TabIndex = 6;
+            this.puertoTCP.Text = "5000";
             // 
             // pantalla
             // 
@@ -122,7 +123,7 @@
             this.buffer.FormattingEnabled = true;
             this.buffer.Location = new System.Drawing.Point(472, 4);
             this.buffer.Name = "buffer";
-            this.buffer.Size = new System.Drawing.Size(205, 212);
+            this.buffer.Size = new System.Drawing.Size(205, 238);
             this.buffer.TabIndex = 8;
             // 
             // TB_red
@@ -141,43 +142,54 @@
             this.red.TabIndex = 10;
             this.red.Text = "Direccion IP";
             // 
-            // Form1
+            // puertoUDP
+            // 
+            this.puertoUDP.Location = new System.Drawing.Point(13, 223);
+            this.puertoUDP.Name = "puertoUDP";
+            this.puertoUDP.Size = new System.Drawing.Size(100, 20);
+            this.puertoUDP.TabIndex = 11;
+            this.puertoUDP.Text = "5001";
+            this.puertoUDP.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
+            // 
+            // Ventana
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(685, 224);
+            this.ClientSize = new System.Drawing.Size(685, 252);
+            this.Controls.Add(this.puertoUDP);
             this.Controls.Add(this.red);
             this.Controls.Add(this.TB_red);
             this.Controls.Add(this.buffer);
             this.Controls.Add(this.pantalla);
-            this.Controls.Add(this.numeroPuerto);
+            this.Controls.Add(this.puertoTCP);
             this.Controls.Add(this.puerto);
             this.Controls.Add(this.velocidad);
             this.Controls.Add(this.rapido);
             this.Controls.Add(this.normal);
             this.Controls.Add(this.lento);
             this.Controls.Add(this.inicio);
-            this.Name = "Form1";
+            this.Name = "Ventana";
             this.Text = "Cliente";
+            this.Load += new System.EventHandler(this.loading);
             ((System.ComponentModel.ISupportInitialize)(this.pantalla)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
-
         #endregion
 
         private System.Windows.Forms.Button inicio;
         private System.Windows.Forms.Button lento;
         private System.Windows.Forms.Button normal;
         private System.Windows.Forms.Button rapido;
-        private System.Windows.Forms.Label velocidad;
         private System.Windows.Forms.Label puerto;
-        private System.Windows.Forms.TextBox numeroPuerto;
-        private System.Windows.Forms.PictureBox pantalla;
-        private System.Windows.Forms.ListBox buffer;
-        private System.Windows.Forms.TextBox TB_red;
         private System.Windows.Forms.Label red;
+        private System.Windows.Forms.Label velocidad;
+        private System.Windows.Forms.ListBox buffer;
+        private System.Windows.Forms.PictureBox pantalla;
+        private System.Windows.Forms.TextBox puertoTCP;
+        private System.Windows.Forms.TextBox TB_red;
+        private System.Windows.Forms.TextBox puertoUDP;
     }
 }
 
