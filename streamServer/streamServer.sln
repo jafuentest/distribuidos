@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "streamServer", "streamServer\streamServer.csproj", "{0D3C0DA9-E848-43BA-AAB5-47AE5E36247A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "streamServer", "streamServer.csproj", "{0D3C0DA9-E848-43BA-AAB5-47AE5E36247A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
